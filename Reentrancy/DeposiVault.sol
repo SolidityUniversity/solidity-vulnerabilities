@@ -17,7 +17,9 @@ contract DepositVault {
         (bool success, ) = msg.sender.call{value: amount}("");
         require(success, "ETH transfer failed");
 
-        //Attacker контракт выполняет функцию receive
+        // ^ После получения средств
+
+        // Attacker контракт выполняет функцию receive
 
         balances[msg.sender] = 0;
     }
@@ -83,6 +85,9 @@ contract Attacker {
     ///     3.3 обновляем mapping balances
 }
 
+
+/// Контракт защищенный от Reentrnacy
+
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract DepositVaultWithoutReentrnacy is ReentrancyGuard {
@@ -93,7 +98,7 @@ contract DepositVaultWithoutReentrnacy is ReentrancyGuard {
         balances[msg.sender] += msg.value;
     }
 
-    ///ПРАВИЛЬНЫЕ СПОСОБЫ ЗАЩИТЫ ОТ REENTRANCY
+    /// ПРАВИЛЬНЫЕ СПОСОБЫ ЗАЩИТЫ ОТ REENTRANCY
     /// 1. CHECKS -> EFFECTS - INTERACTIONS
     /// заптись balances[msg.sender] = 0 перед трансфером 
 
@@ -127,5 +132,5 @@ contract DepositVaultWithoutReentrnacy is ReentrancyGuard {
 
 //начинаем выполнять функцию помеченую как nonReentrant
 //создается "флаг", который помечает, что функция выполняется сейчас
-//если флаг активен - повторный вызов функции будет отменен (require)(=
+//если флаг активен - повторный вызов функции будет отменен (require)
 //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v5.3.0/contracts/utils/ReentrancyGuard.sol
